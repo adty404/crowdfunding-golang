@@ -1,9 +1,11 @@
 package main
 
 import (
+	"crowdfunding-golang/handler"
 	"crowdfunding-golang/user"
 	"log"
 
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -18,12 +20,13 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
+	userHandler := handler.NewUserHandler(userService)
 
-	userInput := user.RegisterUserInput{}
-	userInput.Name = "John"
-	userInput.Occupation = "Programmer"
-	userInput.Email = "contoh@gmail.com"
-	userInput.Password = "password"
+	router := gin.Default()
+	api := router.Group("/api/v1") // API Versioning
 
-	userService.RegisterUser(userInput)
+	// Route
+	api.POST("/users", userHandler.RegisterUser)
+
+	router.Run()
 }
