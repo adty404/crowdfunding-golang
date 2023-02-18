@@ -21,19 +21,6 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
-
-	userByEmail, err := userRepository.FindByEmail("adty404@gmail.com")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if (user.User{}) == userByEmail {
-		log.Println("User not found")
-	}
-
-	log.Println(userByEmail)
-
 	userHandler := handler.NewUserHandler(userService)
 
 	router := gin.Default()
