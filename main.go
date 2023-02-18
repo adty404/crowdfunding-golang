@@ -11,7 +11,8 @@ import (
 )
 
 func main() {
-	dsn := "root:root@tcp(localhost:3306)/crowdfunding_golang?charset=utf8&parseTime=True&loc=Local"
+	dsn := "root:@tcp(localhost:3306)/crowdfunding_golang?charset=utf8&parseTime=True&loc=Local"
+	// dsn := "root:root@tcp(localhost:3306)/crowdfunding_golang?charset=utf8&parseTime=True&loc=Local"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 	if err != nil {
@@ -20,6 +21,19 @@ func main() {
 
 	userRepository := user.NewRepository(db)
 	userService := user.NewService(userRepository)
+
+	userByEmail, err := userRepository.FindByEmail("adty404@gmail.com")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if (user.User{}) == userByEmail {
+		log.Println("User not found")
+	}
+
+	log.Println(userByEmail)
+
 	userHandler := handler.NewUserHandler(userService)
 
 	router := gin.Default()
