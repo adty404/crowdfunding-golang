@@ -81,6 +81,7 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 
 		response := helper.APIResponse("Email checking failed", http.StatusUnprocessableEntity, "error", errorMessage)
 		c.JSON(http.StatusUnprocessableEntity, response)
+		return
 	}
 
 	isEmailAvailable, err := h.service.IsEmailAvailable(input)
