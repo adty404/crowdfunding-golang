@@ -106,5 +106,38 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 }
 
 func (h *userHandler) UploadAvatar(c *gin.Context) {
-	
+	file, err := c.FormFile("avatar")
+	if err != nil {
+		data := gin.H{
+			"is_uplaoded" : false,
+		}
+		response := helper.APIResponse("Failed to upload avatar image!", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	path := "images/" + file.Filename
+	err = c.SaveUploadedFile(file, path)
+	if err != nil {
+		data := gin.H{
+			"is_uplaoded" : false,
+		}
+		response := helper.APIResponse("Failed to upload avatar image!", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	userID := 1 //hardcode, would use JWT later 
+	_, err = h.service.SaveAvatar(userID, path)
+	if err != nil {
+		data := gin.H{
+			"is_uplaoded" : false,
+		}
+		response := helper.APIResponse("Failed to upload avatar image!", http.StatusBadRequest, "error", data)
+		c.JSON(http.StatusBadRequest, response)
+	}
+
+	data := gin.H{
+		"is_uplaoded" : true,
+	}
+	response := helper.APIResponse("Avatar successfully uploaded!", http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, response)
 }
