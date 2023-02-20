@@ -3,6 +3,7 @@ package handler
 import (
 	"crowdfunding-golang/helper"
 	"crowdfunding-golang/user"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -115,7 +116,10 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 	}
 
-	path := "images/" + file.Filename
+	userID := 1 //hardcode, would use JWT later
+
+	path := fmt.Sprintf("images/%d-%s", userID, file.Filename)
+
 	err = c.SaveUploadedFile(file, path)
 	if err != nil {
 		data := gin.H{
@@ -125,7 +129,6 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 	}
 
-	userID := 1 //hardcode, would use JWT later 
 	_, err = h.service.SaveAvatar(userID, path)
 	if err != nil {
 		data := gin.H{
