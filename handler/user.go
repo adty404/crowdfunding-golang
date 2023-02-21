@@ -11,12 +11,12 @@ import (
 )
 
 type userHandler struct {
-	service user.Service
+	userService user.Service
 	authService auth.Service
 }
 
 func NewUserHandler(userService user.Service, authService auth.Service) *userHandler {
-	return &userHandler{service: userService, authService: authService}
+	return &userHandler{userService, authService}
 }
 
 func (h *userHandler) RegisterUser(c *gin.Context) {
@@ -32,7 +32,7 @@ func (h *userHandler) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	newUser, err := h.service.RegisterUser(input)
+	newUser, err := h.userService.RegisterUser(input)
 	if err != nil {
 		response := helper.APIResponse("Register account failed", http.StatusBadRequest, "error", nil)
 		c.JSON(http.StatusBadRequest, response)
@@ -65,7 +65,7 @@ func (h *userHandler) Login(c *gin.Context) {
 		return
 	}
 
-	loggedInUser, err := h.service.Login(input)
+	loggedInUser, err := h.userService.Login(input)
 	if err != nil {
 		errorMessage := gin.H{"errors": err.Error()}
 		response := helper.APIResponse("Login failed", http.StatusUnprocessableEntity, "error", errorMessage)
@@ -99,7 +99,7 @@ func (h *userHandler) CheckEmailAvailability(c *gin.Context) {
 		return
 	}
 
-	isEmailAvailable, err := h.service.IsEmailAvailable(input)
+	isEmailAvailable, err := h.userService.IsEmailAvailable(input)
 	if err != nil {
 		errorMessage := gin.H{"errors": "Server error"}
 		response := helper.APIResponse("Email checking failed", http.StatusUnprocessableEntity, "error", errorMessage)
@@ -143,7 +143,7 @@ func (h *userHandler) UploadAvatar(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, response)
 	}
 
-	_, err = h.service.SaveAvatar(userID, path)
+	_, err = h.userService.SaveAvatar(userID, path)
 	if err != nil {
 		data := gin.H{
 			"is_uplaoded" : false,
