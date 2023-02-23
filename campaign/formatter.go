@@ -25,3 +25,14 @@ func FormatCampaign(campaign Campaign) CampaignFormatter {
 
 	return campaignFormatter
 }
+
+func FormatCampaigns(campaigns []Campaign) []CampaignFormatter {
+	var campaignsFormatter []CampaignFormatter
+
+	for _, campaign := range campaigns {
+		campaignFormatter := FormatCampaign(campaign)
+		campaignsFormatter = append(campaignsFormatter, campaignFormatter)
+	}
+
+	return campaignsFormatter
+}
