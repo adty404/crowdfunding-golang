@@ -33,11 +33,11 @@ func main() {
 
 	campaignRepository := campaign.NewRepository(db)
 	campaignService := campaign.NewService(campaignRepository)
-	campaigns, _ := campaignService.FindCampaigns(1)
+	campaigns, _ := campaignService.GetCampaigns(1)
 	fmt.Println(len(campaigns))
 
 	router := gin.Default()
-	api := router.Group("/api/v1") // API Versioning
+	api := router.Group("/api/v1")
 
 	// Route
 	api.POST("/users", userHandler.RegisterUser)
