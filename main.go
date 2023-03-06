@@ -49,6 +49,7 @@ func main() {
 
 	// campaigns
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
+	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 
 	router.Run()
 }
