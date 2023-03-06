@@ -24,6 +24,12 @@ type CampaignDetailFormatter struct {
 	UserID           int      `json:"user_id"`
 	Slug             string   `json:"slug"`
 	Perks            []string `json:"perks"`
+	User			 CampaignUserFormatter `json:"user"`
+}
+
+type CampaignUserFormatter struct {
+	Name 		   string `json:"name"`
+	ImageURL       string `json:"image_url"`
 }
 
 func FormatCampaign(campaign Campaign) CampaignFormatter {
@@ -71,13 +77,23 @@ func FormatCampaignDetail(campaign Campaign) CampaignDetailFormatter {
 		campaignDetailFormatter.ImageURL = campaign.CampaignImages[0].FileName
 	}
 
+	// Perks
 	var perks []string
 
 	for _, perk := range strings.Split(campaign.Perks, ",") {
 		perks = append(perks, strings.TrimSpace(perk))
 	}
-
 	campaignDetailFormatter.Perks = perks
 
+	// User
+	user := campaign.User
+	campaignUserFormatter := CampaignUserFormatter{}
+
+	campaignUserFormatter.Name = user.Name
+	campaignUserFormatter.ImageURL = user.AvatarFileName
+
+	campaignDetailFormatter.User = campaignUserFormatter
+
+	// Return
 	return campaignDetailFormatter
 }
