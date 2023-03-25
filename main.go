@@ -51,6 +51,7 @@ func main() {
 	api.GET("/campaigns", campaignHandler.GetCampaigns)
 	api.GET("/campaigns/:id", campaignHandler.GetCampaign)
 	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
+	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
 
 	router.Run()
 }
@@ -71,6 +72,7 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 			tokenString = arrayToken[1]
 		}
 
+		// Validate token from header request with secret key
 		token, err := authService.ValidateToken(tokenString)
 		if err != nil {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
@@ -78,6 +80,7 @@ func authMiddleware(authService auth.Service, userService user.Service) gin.Hand
 			return
 		}
 
+		// next, get user id from token by using claim (payload)
 		claim, ok := token.Claims.(jwt.MapClaims)
 		if !ok || !token.Valid {
 			response := helper.APIResponse("Unauthorized", http.StatusUnauthorized, "error", nil)
