@@ -48,6 +48,10 @@ func (r *repository) FindByID(ID int) (Campaign, error) {
 		return campaign, err
 	}
 
+	if campaign.ID == 0 {
+		return campaign, gorm.ErrRecordNotFound
+	}
+
 	return campaign, nil
 }
 

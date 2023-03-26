@@ -90,6 +90,13 @@ func (h *campaignHandler) UpdateCampaign(c *gin.Context) {
 		return
 	}
 
+	_, err = h.service.GetCampaignByID(inputID)
+	if err != nil {
+		response := helper.APIResponse("Failed to update campaign", http.StatusBadRequest, "error", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
 	var inputData campaign.CreateCampaignInput
 	err = c.ShouldBindJSON(&inputData)
 	if err != nil {
