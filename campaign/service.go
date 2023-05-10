@@ -95,6 +95,17 @@ func (s *service) UpdateCampaign(inputID GetCampaignDetailInput, inputData Creat
 }
 
 func (s *service) SaveCampaignImage (input CreateCampaignImageInput, fileLocation string) (CampaignImage, error) {
+	// Authorization
+	campaign, err := s.repository.FindByID(input.CampaignID)
+	if err != nil {
+		return CampaignImage{}, err
+	}
+
+	if campaign.UserID != input.User.ID {
+		return CampaignImage{}, errors.New("not an owner of the campaign")
+	}
+
+	// Check if isPrimary
 	isPrimary := 0
 	if input.IsPrimary {
 		isPrimary = 1
@@ -105,6 +116,7 @@ func (s *service) SaveCampaignImage (input CreateCampaignImageInput, fileLocatio
 		}
 	}
 
+	// Save image to DB
 	campaignImage := CampaignImage{}
 	campaignImage.CampaignID = input.CampaignID
 	campaignImage.IsPrimary = isPrimary
