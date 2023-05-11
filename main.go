@@ -34,6 +34,8 @@ func main() {
 	campaignService := campaign.NewService(campaignRepository)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
+	// transactionRepository := transaction.NewRepository(db)
+
 	router := gin.Default()
 	// Route for static file
 	router.Static("/images", "./images")
