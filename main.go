@@ -5,6 +5,7 @@ import (
 	"crowdfunding-golang/campaign"
 	"crowdfunding-golang/handler"
 	"crowdfunding-golang/helper"
+	"crowdfunding-golang/transaction"
 	"crowdfunding-golang/user"
 	"log"
 	"net/http"
@@ -34,7 +35,9 @@ func main() {
 	campaignService := campaign.NewService(campaignRepository)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
-	// transactionRepository := transaction.NewRepository(db)
+	transactionRepository := transaction.NewRepository(db)
+	transactionService := transaction.NewService(transactionRepository)
+	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()
 	// Route for static file
@@ -55,6 +58,9 @@ func main() {
 	api.POST("/campaigns", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
 	api.PUT("/campaigns/:id", authMiddleware(authService, userService), campaignHandler.UpdateCampaign)
 	api.POST("/campaign-images", authMiddleware(authService, userService), campaignHandler.UploadCampaignImage)
+
+	// transactions
+	api.GET("/campaigns/:id/transactions", authMiddleware(authService, userService), transactionHandler.GetCampaignTransactions)
 
 	router.Run()
 }
