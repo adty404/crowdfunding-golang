@@ -2,10 +2,10 @@ package payment
 
 import (
 	"crowdfunding-golang/user"
-	"errors"
 	"os"
 	"strconv"
 
+	"github.com/joho/godotenv"
 	midtrans "github.com/veritrans/go-midtrans"
 )
 
@@ -21,12 +21,13 @@ func NewService() *service {
 }
 
 func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string, error) {
+	err := godotenv.Load(".env")
+	if err != nil {
+		return "", err
+	}
+
 	midtrans_client_key := os.Getenv("MIDTRANS_CLIENT_KEY")
 	midtrans_server_key := os.Getenv("MIDTRANS_SERVER_KEY")
-
-	if midtrans_client_key == "" || midtrans_server_key == "" {
-		return "", errors.New("midtrans client key or server key is empty")
-	}
 
 	midclient := midtrans.NewClient()
     midclient.ServerKey = midtrans_server_key
