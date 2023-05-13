@@ -5,6 +5,7 @@ import (
 	"crowdfunding-golang/campaign"
 	"crowdfunding-golang/handler"
 	"crowdfunding-golang/helper"
+	"crowdfunding-golang/payment"
 	"crowdfunding-golang/transaction"
 	"crowdfunding-golang/user"
 	"log"
@@ -35,8 +36,10 @@ func main() {
 	campaignService := campaign.NewService(campaignRepository)
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
+	paymentService := payment.NewService()
+
 	transactionRepository := transaction.NewRepository(db)
-	transactionService := transaction.NewService(transactionRepository, campaignRepository)
+	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 	transactionHandler := handler.NewTransactionHandler(transactionService)
 
 	router := gin.Default()

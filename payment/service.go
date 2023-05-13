@@ -1,27 +1,26 @@
 package payment
 
 import (
-	"crowdfunding-golang/transaction"
 	"crowdfunding-golang/user"
 	"errors"
 	"os"
 	"strconv"
 
-	"github.com/veritrans/go-midtrans"
+	midtrans "github.com/veritrans/go-midtrans"
 )
 
 type service struct {
 }
 
 type Service interface {
-	GetToken(transaction transaction.Transaction, user user.User) (string, error)
+	GetPaymentURL(transaction Transaction, user user.User) (string, error)
 }
 
 func NewService() *service {
 	return &service{}
 }
 
-func (s *service) GetToken(transaction transaction.Transaction, user user.User) (string, error) {
+func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string, error) {
 	midtrans_client_key := os.Getenv("MIDTRANS_CLIENT_KEY")
 	midtrans_server_key := os.Getenv("MIDTRANS_SERVER_KEY")
 
