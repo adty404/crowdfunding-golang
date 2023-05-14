@@ -1,8 +1,6 @@
 package payment
 
 import (
-	"crowdfunding-golang/campaign"
-	"crowdfunding-golang/transaction"
 	"crowdfunding-golang/user"
 	"os"
 	"strconv"
@@ -12,17 +10,14 @@ import (
 )
 
 type service struct {
-	transactionRepository transaction.Repository
-	campaignRepository    campaign.Repository
 }
 
 type Service interface {
 	GetPaymentURL(transaction Transaction, user user.User) (string, error)
-	ProcessPayment(notification TransactionNotificationInput) error
 }
 
-func NewService(transactionRepository transaction.Repository, campaignRepository campaign.Repository) *service {
-	return &service{transactionRepository, campaignRepository}
+func NewService() *service {
+	return &service{}
 }
 
 func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string, error) {
@@ -60,43 +55,4 @@ func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string
 	}
 
 	return snapTokenResp.RedirectURL, nil
-}
-
-func (s *service) ProcessPayment(notification TransactionNotificationInput) error {
-	transaction_id, _ := strconv.Atoi(notification.OrderID)
-
-	transaction, err := s.transactionRepository.GetByID(transaction_id)
-	if err != nil {
-		return err
-	}
-
-	if notification.PaymentType == "credit_card" && notification.TransactionStatus == "capture" && notification.FraudStatus == "accept" {
-		transaction.Status = "paid"
-	} else if notification.TransactionStatus == "settlement" {
-		transaction.Status = "paid"
-	} else if notification.TransactionStatus == "deny" || notification.TransactionStatus == "expire" || notification.TransactionStatus == "cancel" {
-		transaction.Status = "cancelled"
-	}
-
-	updatedTransaction, err := s.transactionRepository.Update(transaction)
-	if err != nil {
-		return err
-	}
-
-	campaign, err := s.campaignRepository.FindByID(updatedTransaction.CampaignID)
-	if err != nil {
-		return err
-	}
-
-	if updatedTransaction.Status == "paid" {
-		campaign.BackerCount = campaign.BackerCount + 1
-		campaign.CurrentAmount = campaign.CurrentAmount + updatedTransaction.Amount
-
-		_, err = s.campaignRepository.Update(campaign)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
