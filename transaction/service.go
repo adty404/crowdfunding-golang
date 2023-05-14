@@ -73,6 +73,10 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 		return newTransaction, err
 	}
 
+	if paymentURL == "" {
+		return newTransaction, errors.New("error from midtrans payment service")
+	}
+
 	newTransaction.PaymentURL = paymentURL
 	newTransaction, err = s.repository.Update(newTransaction)
 	if err != nil {
