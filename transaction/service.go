@@ -7,9 +7,9 @@ import (
 )
 
 type service struct {
-	repository         	Repository
-	campaignRepository 	campaign.Repository
-	paymentService 		payment.Service
+	repository         Repository
+	campaignRepository campaign.Repository
+	paymentService     payment.Service
 }
 
 type Service interface {
@@ -62,7 +62,7 @@ func (s *service) CreateTransaction(input CreateTransactionInput) (Transaction, 
 	}
 
 	paymentTransaction := payment.Transaction{
-		ID: newTransaction.ID,
+		ID:     newTransaction.ID,
 		Amount: newTransaction.Amount,
 	}
 
