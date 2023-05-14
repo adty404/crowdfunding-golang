@@ -40,7 +40,7 @@ func main() {
 	paymentService := payment.NewService(transactionRepository, campaignRepository)
 
 	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
-	transactionHandler := handler.NewTransactionHandler(transactionService)
+	transactionHandler := handler.NewTransactionHandler(transactionService, paymentService)
 
 	router := gin.Default()
 	// Route for static file
