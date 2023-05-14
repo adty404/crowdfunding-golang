@@ -1,6 +1,7 @@
 package payment
 
 import (
+	"crowdfunding-golang/campaign"
 	"crowdfunding-golang/transaction"
 	"crowdfunding-golang/user"
 	"os"
@@ -12,6 +13,7 @@ import (
 
 type service struct {
 	transactionRepository transaction.Repository
+	campaignRepository    campaign.Repository
 }
 
 type Service interface {
@@ -19,8 +21,8 @@ type Service interface {
 	ProcessPayment(notification TransactionNotificationInput) error
 }
 
-func NewService(transactionRepository transaction.Repository) *service {
-	return &service{transactionRepository}
+func NewService(transactionRepository transaction.Repository, campaignRepository campaign.Repository) *service {
+	return &service{transactionRepository, campaignRepository}
 }
 
 func (s *service) GetPaymentURL(transaction Transaction, user user.User) (string, error) {
@@ -76,33 +78,25 @@ func (s *service) ProcessPayment(notification TransactionNotificationInput) erro
 		transaction.Status = "cancelled"
 	}
 
-	_, err = s.transactionRepository.Update(transaction)
+	updatedTransaction, err := s.transactionRepository.Update(transaction)
 	if err != nil {
 		return err
 	}
 
+	campaign, err := s.campaignRepository.FindByID(updatedTransaction.CampaignID)
+	if err != nil {
+		return err
+	}
+
+	if updatedTransaction.Status == "paid" {
+		campaign.BackerCount = campaign.BackerCount + 1
+		campaign.CurrentAmount = campaign.CurrentAmount + updatedTransaction.Amount
+
+		_, err = s.campaignRepository.Update(campaign)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
-
-	// if notification.TransactionStatus == "capture" {
-	// 	if notification.FraudStatus == "challenge" {
-	// 		transaction.Status = "challenge"
-	// 	} else if notification.FraudStatus == "accept" {
-	// 		transaction.Status = "paid"
-	// 	}
-	// }
-
-	// if notification.TransactionStatus == "settlement" {
-	// 	transaction.Status = "paid"
-	// }
-
-	// if notification.TransactionStatus == "deny" || notification.TransactionStatus == "expire" || notification.TransactionStatus == "cancel" {
-	// 	transaction.Status = "cancelled"
-	// }
-
-	// _, err = s.transactionRepository.Update(transaction)
-	// if err != nil {
-	// 	return err
-	// }
-
-	// return nil
 }

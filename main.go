@@ -37,7 +37,7 @@ func main() {
 	campaignHandler := handler.NewCampaignHandler(campaignService)
 
 	transactionRepository := transaction.NewRepository(db)
-	paymentService := payment.NewService(transactionRepository)
+	paymentService := payment.NewService(transactionRepository, campaignRepository)
 
 	transactionService := transaction.NewService(transactionRepository, campaignRepository, paymentService)
 	transactionHandler := handler.NewTransactionHandler(transactionService)
